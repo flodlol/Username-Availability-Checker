@@ -30,7 +30,10 @@ async def _check_platform(
             "reason": platform.get("reason", "Not checkable"),
         }
 
-    url = platform["profile_url_template"].format(username=username)
+    profile_url = platform["profile_url_template"].format(username=username)
+    url = platform.get("check_url_template", platform["profile_url_template"]).format(
+        username=username
+    )
     method = platform.get("check_method", "GET")
     headers = {**DEFAULT_HEADERS, **platform.get("headers", {})}
 
@@ -46,6 +49,7 @@ async def _check_platform(
         }
 
     status_code = response.status_code
+    text_lower = response.text.lower() if response.text else ""
     available_statuses = set(platform.get("available_statuses", []))
     taken_statuses = set(platform.get("taken_statuses", []))
     unknown_statuses = set(platform.get("unknown_statuses", []))
@@ -53,16 +57,60 @@ async def _check_platform(
     if status_code in available_statuses:
         return {
             "platform": platform["name"],
-            "url": url,
+            "url": profile_url,
             "status": "available",
             "http_status": status_code,
             "reason": f"Profile returns {status_code} => likely available",
         }
 
+    if status_code in taken_statuses:
+        available_markers = platform.get("available_markers", [])
+        unknown_markers = platform.get("unknown_markers", [])
+        taken_markers = platform.get("taken_markers", [])
+
+        for marker in unknown_markers:
+            if marker in text_lower:
+                return {
+                    "platform": platform["name"],
+                    "url": profile_url,
+                    "status": "unknown",
+                    "http_status": status_code,
+                    "reason": "Page requires verification or is blocked",
+                }
+
+        for marker in available_markers:
+            if marker in text_lower:
+                return {
+                    "platform": platform["name"],
+                    "url": profile_url,
+                    "status": "available",
+                    "http_status": status_code,
+                    "reason": "Page indicates account does not exist",
+                }
+
+        for marker in taken_markers:
+            if marker.format(username=username).lower() in text_lower:
+                return {
+                    "platform": platform["name"],
+                    "url": profile_url,
+                    "status": "taken",
+                    "http_status": status_code,
+                    "reason": "Page includes username marker",
+                }
+
+        if platform.get("assume_taken_on_200"):
+            return {
+                "platform": platform["name"],
+                "url": profile_url,
+                "status": "taken",
+                "http_status": status_code,
+                "reason": "Status 200 without missing markers => likely taken",
+            }
+
     if status_code in taken_statuses and platform.get("ambiguous_on_200"):
         return {
             "platform": platform["name"],
-            "url": url,
+            "url": profile_url,
             "status": "unknown",
             "http_status": status_code,
             "reason": "Status 200 but platform may serve challenges or cached pages",
@@ -71,7 +119,7 @@ async def _check_platform(
     if status_code in taken_statuses:
         return {
             "platform": platform["name"],
-            "url": url,
+            "url": profile_url,
             "status": "taken",
             "http_status": status_code,
             "reason": f"Profile returns {status_code} => likely taken",
@@ -80,7 +128,7 @@ async def _check_platform(
     if status_code in unknown_statuses:
         return {
             "platform": platform["name"],
-            "url": url,
+            "url": profile_url,
             "status": "unknown",
             "http_status": status_code,
             "reason": f"Status {status_code} => unclear availability",
@@ -88,7 +136,7 @@ async def _check_platform(
 
     return {
         "platform": platform["name"],
-        "url": url,
+        "url": profile_url,
         "status": "unknown",
         "http_status": status_code,
         "reason": f"Unexpected status {status_code}",

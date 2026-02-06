@@ -14,7 +14,7 @@
     <div class="page">
       <main class="container">
       <header class="hero">
-        <h1>Handle Scout</h1>
+        <h1>Handle Scout 🔎</h1>
         <p>Quick, best-effort username checks across popular platforms.</p>
       </header>
 
@@ -43,11 +43,15 @@
               <th>Platform</th>
               <th>Status</th>
               <th>Link</th>
-              <th>Notes</th>
             </tr>
           </thead>
           <tbody id="results-body"></tbody>
         </table>
+        <div class="results-separator" aria-hidden="true"></div>
+        <div id="suggestions" class="suggestions" hidden>
+          <div class="suggestions-title">Suggestions</div>
+          <div id="suggestions-list" class="suggestions-list"></div>
+        </div>
       </section>
 
       </main>
@@ -92,7 +96,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 >here</a
-              .
+              >.
             </div>
           </div>
         </div>

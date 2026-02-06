@@ -6,8 +6,11 @@ const loadingEl = document.getElementById("loading");
 const errorEl = document.getElementById("error");
 const copyBtn = document.getElementById("copy-btn");
 const downloadBtn = document.getElementById("download-btn");
+const suggestionsBox = document.getElementById("suggestions");
+const suggestionsList = document.getElementById("suggestions-list");
 
 let lastPayload = null;
+let lastPointer = { x: 0, y: 0 };
 
 const usernamePattern = /^[A-Za-z0-9_.]{2,30}$/;
 
@@ -19,6 +22,25 @@ function setLoading(isLoading) {
 function showError(message) {
   errorEl.textContent = message;
   errorEl.hidden = !message;
+}
+
+function showCursorToast(message, tone = "info") {
+  if (!message) return;
+  const toast = document.createElement("div");
+  toast.className = `cursor-toast${tone === "error" ? " cursor-toast--error" : ""}`;
+  toast.textContent = message;
+  toast.style.left = `${lastPointer.x}px`;
+  toast.style.top = `${lastPointer.y}px`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 800);
+}
+
+function resetResults() {
+  resultsCard.hidden = true;
+  suggestionsBox.hidden = true;
+  copyBtn.disabled = true;
+  downloadBtn.disabled = true;
+  lastPayload = null;
 }
 
 function statusClass(status) {
@@ -40,26 +62,43 @@ function renderResults(payload) {
     statusCell.className = statusClass(item.status);
 
     const linkCell = document.createElement("td");
-    if (item.url) {
+    if (item.url && item.status === "taken") {
       const link = document.createElement("a");
       link.href = item.url;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
-      link.textContent = item.status === "taken" ? item.url : "View";
+      link.textContent = "View";
+      linkCell.appendChild(link);
+    } else if (item.url && item.status === "unknown") {
+      const link = document.createElement("a");
+      link.href = item.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "Check";
       linkCell.appendChild(link);
     } else {
       linkCell.textContent = "-";
     }
 
-    const notesCell = document.createElement("td");
-    notesCell.textContent = item.reason || "";
-
     row.appendChild(platformCell);
     row.appendChild(statusCell);
     row.appendChild(linkCell);
-    row.appendChild(notesCell);
     resultsBody.appendChild(row);
   });
+
+  const suggestions = payload.suggestions || [];
+  suggestionsList.innerHTML = "";
+  if (suggestions.length) {
+    suggestions.forEach((value) => {
+      const chip = document.createElement("span");
+      chip.className = "suggestion-chip";
+      chip.textContent = value;
+      suggestionsList.appendChild(chip);
+    });
+    suggestionsBox.hidden = false;
+  } else {
+    suggestionsBox.hidden = true;
+  }
 
   resultsCard.hidden = false;
   copyBtn.disabled = false;
@@ -71,6 +110,7 @@ async function checkUsername() {
 
   if (!usernamePattern.test(username)) {
     showError("Use 2-30 characters: letters, numbers, underscore, or dot.");
+    resetResults();
     return;
   }
 
@@ -84,7 +124,7 @@ async function checkUsername() {
     if (!response.ok) {
       const message = data?.detail || "Something went wrong.";
       showError(message);
-      resultsCard.hidden = true;
+      resetResults();
       return;
     }
 
@@ -92,9 +132,36 @@ async function checkUsername() {
     renderResults(data);
   } catch (err) {
     showError("Network error. Please try again.");
+    resetResults();
   } finally {
     setLoading(false);
   }
+}
+
+function copyWithFallback(text) {
+  if (!text) return Promise.reject(new Error("empty"));
+
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  }
+
+  return new Promise((resolve, reject) => {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.top = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+
+    const ok = document.execCommand("copy");
+    textarea.remove();
+    if (ok) {
+      resolve();
+    } else {
+      reject(new Error("copy failed"));
+    }
+  });
 }
 
 async function copyJson() {
@@ -102,11 +169,20 @@ async function copyJson() {
   const text = JSON.stringify(lastPayload, null, 2);
 
   try {
-    await navigator.clipboard.writeText(text);
-    showError("Copied JSON to clipboard.");
-    setTimeout(() => showError(""), 2000);
+    await copyWithFallback(text);
+    showCursorToast("Copied JSON to clipboard.");
   } catch (err) {
-    showError("Clipboard unavailable. Try downloading instead.");
+    showCursorToast("Clipboard unavailable. Try downloading instead.", "error");
+  }
+}
+
+async function copySuggestion(value) {
+  if (!value) return;
+  try {
+    await copyWithFallback(value);
+    showCursorToast("Copied suggestion to clipboard.");
+  } catch (err) {
+    showCursorToast("Clipboard unavailable. Try copying manually.", "error");
   }
 }
 
@@ -130,5 +206,14 @@ usernameInput.addEventListener("keydown", (event) => {
     checkUsername();
   }
 });
+window.addEventListener("mousemove", (event) => {
+  lastPointer = { x: event.clientX, y: event.clientY };
+});
 copyBtn.addEventListener("click", copyJson);
 downloadBtn.addEventListener("click", downloadJson);
+suggestionsList.addEventListener("click", (event) => {
+  const target = event.target;
+  if (target && target.classList.contains("suggestion-chip")) {
+    copySuggestion(target.textContent);
+  }
+});

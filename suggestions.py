@@ -13,7 +13,18 @@ def _is_valid(candidate: str) -> bool:
 
 
 def generate_suggestions(username: str, results: list[dict[str, Any]]) -> list[str]:
-    key_platforms = {"GitHub", "Reddit", "TikTok", "X (Twitter)"}
+    key_platforms = {
+        "GitHub",
+        "Reddit",
+        "TikTok",
+        "X",
+        "GitLab",
+        "Bitbucket",
+        "Dev.to",
+        "CodePen",
+        "Dribbble",
+        "Behance",
+    }
     needs_suggestions = any(
         r["platform"] in key_platforms and r["status"] != "available" for r in results
     )
