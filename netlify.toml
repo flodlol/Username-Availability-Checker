@@ -1,7 +1,10 @@
 [build]
-  command = "ls -la netlify && ls -la netlify/functions && mkdir -p static/public && cp -R public/* static/public/"
+  command = "cp -R public static/"
   publish = "static"
   functions = "netlify/functions"
+
+[functions]
+  python_version = "3.11"
 
 [[redirects]]
   from = "/api/*"
