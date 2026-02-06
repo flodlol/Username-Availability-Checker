@@ -90,29 +90,9 @@ Returns JSON with availability status for each platform.
 
 ## Contributing
 
-Pull requests are welcome! Adding new platforms is super easy - just one line in `platforms.py`.
-
----
-
-## License
-
-MIT
-
-Checklist:
-
-- Choose a profile URL template
-- Decide which status codes indicate availability
-- Add any special headers
-- Keep logic simple and explainable
-
-## Contributing
-
 Pull requests are welcome. Please:
 
 - Keep checks best-effort and lightweight
 - Avoid API keys or heavy scraping
 - Add clear reasons for `unknown` results
 
-## License
-
-MIT
