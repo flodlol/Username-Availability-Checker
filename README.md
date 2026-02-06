@@ -1,62 +1,101 @@
-# Handle Scout
+# Handle Scout 🔎
 
-Handle Scout is a small FastAPI app that checks whether a username is likely
-available on several popular platforms. Results are best-effort and may be
-inaccurate for platforms that block or challenge automated requests.
+Check if a username is available across multiple platforms — instantly!
 
-## Quick start
+![License](https://img.shields.io/badge/license-MIT-green)
+![Python](https://img.shields.io/badge/python-3.8+-blue)
+
+## ✨ Features
+
+- Check username availability on 10+ platforms at once
+- Simple web interface — no coding required
+- Fast parallel checking
+- Suggestions for alternative usernames
+
+## 🚀 Quick Start (No Coding Required!)
+
+### Step 1: Download
+
+Click the green **Code** button above, then **Download ZIP**. Extract it anywhere.
+
+### Step 2: Install Python
+
+If you don't have Python installed:
+- **Mac**: Open Terminal and run `brew install python3`
+- **Windows**: Download from [python.org](https://python.org/downloads) (check "Add to PATH"!)
+- **Linux**: Run `sudo apt install python3 python3-pip`
+
+### Step 3: Run
+
+- **Mac/Linux**: Double-click `run.sh` or open Terminal and run `./run.sh`
+- **Windows**: Double-click `run.bat`
+
+### Step 4: Open
+
+Go to **http://localhost:8000** in your browser. Done! 🎉
+
+---
+
+## 🛠️ For Developers
 
 ```bash
+git clone https://github.com/flodlol/Username-Availability-Checker.git
+cd Username-Availability-Checker
 pip install -r requirements.txt
 python app.py
 ```
 
-Open http://localhost:8000 in your browser.
+## 📡 Supported Platforms
 
-## Supported platforms
+| Platform | Status |
+|----------|--------|
+| GitHub | ✅ Reliable |
+| Reddit | ✅ Reliable |
+| GitLab | ✅ Reliable |
+| Bitbucket | ✅ Reliable |
+| Dev.to | ✅ Reliable |
+| CodePen | ✅ Reliable |
+| Dribbble | ✅ Reliable |
+| Behance | ✅ Reliable |
+| X (Twitter) | ⚠️ Manual check needed |
+| TikTok | ⚠️ Manual check needed |
 
-- GitHub
-- Reddit
-- TikTok (best-effort, may return unknown)
-- X (Twitter) (best-effort, may return unknown)
-- Discord (reported as unknown)
+## 🤝 Contributing
 
-## API example
+**Want to add a new platform?** It's super easy!
 
-Request:
+1. Fork this repo
+2. Edit `platforms.py` and add one line:
+   ```python
+   {"name": "Instagram", "url": "https://instagram.com/{username}"},
+   ```
+3. Create a Pull Request
+
+That's it! We'd love your contributions. 💜
+
+### Ideas for contributions:
+- Add more platforms (Instagram, Snapchat, LinkedIn, etc.)
+- Improve the UI
+- Add dark/light mode toggle
+- Translations
+
+---
+
+## 📖 API
 
 ```
-GET /api/check?username=jonasdev
+GET /api/check?username=yourname
 ```
 
-Response:
+Returns JSON with availability status for each platform.
 
-```json
-{
-	"username": "jonasdev",
-	"timestamp": "2026-02-06T12:00:00Z",
-	"results": [
-		{
-			"platform": "GitHub",
-			"url": "https://github.com/jonasdev",
-			"status": "available",
-			"http_status": 404,
-			"reason": "Profile returns 404 => likely available"
-		}
-	],
-	"suggestions": ["jonasdevhq", "jonasdev_", "jonas_dev"]
-}
-```
+## 📄 License
 
-## How it works
+MIT — do whatever you want with it!
 
-- Uses public profile URLs and HTTP status checks (no API keys)
-- Runs checks concurrently with `httpx`
-- Adds timeouts and a basic per-IP rate limit
+---
 
-## Add a new platform
-
-Edit [platforms.py](platforms.py) and add a new entry to `PLATFORMS`.
+Made with ❤️ by [Jonas](https://github.com/flodlol)
 
 Checklist:
 
