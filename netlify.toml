@@ -1,5 +1,5 @@
 [build]
-  command = "mkdir -p static/public && cp -R public/* static/public/"
+  command = "ls -la netlify && ls -la netlify/functions && mkdir -p static/public && cp -R public/* static/public/"
   publish = "static"
   functions = "netlify/functions"
 
