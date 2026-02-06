@@ -10,3 +10,7 @@ venv/
 # OS
 .DS_Store
 .netlify/
+
+# PyInstaller
+build/
+dist/

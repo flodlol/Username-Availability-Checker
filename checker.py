@@ -30,27 +30,8 @@ async def check_platform(platform: dict, username: str, client: httpx.AsyncClien
         return {"platform": platform["name"], "url": profile_url, "status": "error"}
 
 
-async def check_username(username: str) -> dict:
+async def check_username(username: str) -> list:
     async with httpx.AsyncClient(timeout=TIMEOUT, follow_redirects=True) as client:
         tasks = [check_platform(p, username, client) for p in PLATFORMS]
         results = await asyncio.gather(*tasks)
-
-    suggestions = generate_suggestions(username, results)
-    return {"results": list(results), "suggestions": suggestions}
-
-
-def generate_suggestions(username: str, results: list) -> list:
-    if all(r["status"] == "available" for r in results):
-        return []
-
-    suffixes = ["dev", "hq", "app", "official", "real", "the"]
-    suggestions = []
-
-    for suffix in suffixes:
-        suggestions.append(f"{username}_{suffix}")
-        suggestions.append(f"{username}{suffix}")
-
-    for n in ["1", "01", "2", "99"]:
-        suggestions.append(f"{username}{n}")
-
-    return suggestions[:12]
+    return list(results)

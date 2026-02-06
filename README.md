@@ -34,16 +34,17 @@ Check if a username is available across multiple platforms at once.
 ### Windows
 Double-click `run.bat` or run:
 ```
-python app.py
+python cli.py
 ```
 
 ### Mac
 Double-click `run.sh` or run:
 ```
-python3 app.py
+python3 cli.py
 ```
 
-Then open http://localhost:8000 in your browser.
+You will be prompted in the terminal. Type a username and press Enter.
+Type `q` to quit.
 
 ---
 
@@ -78,16 +79,6 @@ For sites that require JavaScript (can't be checked automatically), add:
 
 ---
 
-## API
-
-```
-GET /api/check?username=yourname
-```
-
-Returns JSON with availability status for each platform.
-
----
-
 ## Contributing
 
 Pull requests are welcome. Please:
@@ -95,4 +86,5 @@ Pull requests are welcome. Please:
 - Keep checks best-effort and lightweight
 - Avoid API keys or heavy scraping
 - Add clear reasons for `unknown` results
+Edit `platforms.py` and add a new line:
 

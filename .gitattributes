@@ -1,7 +1,3 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
-# Mark frontend files as not primary language (this is a Python project)
-static/*.js linguist-vendored
-static/*.css linguist-vendored
-static/*.html linguist-vendored

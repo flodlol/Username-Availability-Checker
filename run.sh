@@ -19,15 +19,24 @@ if ! command -v python3 &> /dev/null; then
     exit 1
 fi
 
-# Install dependencies if needed
-if ! python3 -c "import fastapi" 2>/dev/null; then
-    echo "📦 Installing dependencies..."
-    pip3 install -r requirements.txt
+# Create virtual environment if needed
+if [ ! -d ".venv" ]; then
+    echo "📦 Creating virtual environment..."
+    python3 -m venv .venv
     echo ""
 fi
 
-echo "✅ Starting server at http://localhost:8000"
+source .venv/bin/activate
+
+# Install dependencies if needed
+if ! python -c "import colorama" 2>/dev/null; then
+    echo "📦 Installing dependencies..."
+    python -m pip install -r requirements.txt
+    echo ""
+fi
+
+echo "✅ Starting terminal app"
 echo "   Press Ctrl+C to stop"
 echo ""
 
-python3 app.py
+python cli.py
