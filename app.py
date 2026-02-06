@@ -48,6 +48,16 @@ async def index() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
 
 
+@app.get("/style.css")
+async def style_css() -> FileResponse:
+    return FileResponse(STATIC_DIR / "style.css")
+
+
+@app.get("/app.js")
+async def app_js() -> FileResponse:
+    return FileResponse(STATIC_DIR / "app.js")
+
+
 @app.get("/api/check")
 async def api_check(username: str, request: Request) -> JSONResponse:
     _rate_limit(request)
