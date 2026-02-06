@@ -1,9 +1,0 @@
-[build]
-  command = "cp -R public static/"
-  publish = "static"
-  functions = "netlify/functions"
-
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api"
-  status = 200
