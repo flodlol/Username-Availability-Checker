@@ -14,4 +14,5 @@ PLATFORMS = [
     {"name": "Dribbble", "url": "https://dribbble.com/{username}"},
     {"name": "Behance", "url": "https://www.behance.net/{username}"},
     {"name": "Hugging Face", "url": "https://huggingface.co/{username}"},
+    {"name": "Figma", "url": "https://www.figma.com/@{username}", "unreliable": True},
 ]
