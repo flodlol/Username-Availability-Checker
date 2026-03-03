@@ -100,8 +100,6 @@ For sites that require JavaScript (can't be checked automatically), add:
 
 ## Contributing
 
-## Contributing
-
 Contributions are welcome and appreciated! Whether it's fixing a typo, adding a feature, or just reporting a bug. All help is valued.
 
 ### Pull requests are welcome. Please:
